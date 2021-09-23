@@ -14,6 +14,13 @@ const todoInput = document.querySelector('.todo-input');
 
 const todos = [];
 
+function addToLocalStorage(todos) {
+  // conver the array to string then store it.
+  localStorage.setItem('todos', JSON.stringify(todos));
+  // render them to screen
+  renderTodos(todos);
+}
+
 function addTodo(item) {
   // if item is not empty
   if (item !== '') {
@@ -25,12 +32,14 @@ function addTodo(item) {
     };
 
     todos.push(todo);
-    renderTodos(todos); // then renders them between <ul>
+    addToLocalStorage(todos);
     todoInput.value = '';
   }
 }
 
 todoForm.addEventListener('submit', (e) => {
   e.preventDefault();
+
+  console.log(todoInput.value)
   addTodo(todoInput.value);
 });
