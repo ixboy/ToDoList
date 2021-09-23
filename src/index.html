@@ -9,23 +9,24 @@
 
 <body>
   <div class="container">
-    <div class="clear">
-      <div id="date"></div>
-      <i class="fas fa-sync"></i>
-    </div>
-    <section>
-      <h1 class="title">Today's To Do</h1>
-    </section>
-    <section class="add-to-do">
+    <h1 class="title">To Do list</h1>
+    <section class="todo-form">
       <form>
-        <input type="text" name="text" class="input" placeholder="Add to your list..." />
-        <button class="btn" type="submit">
+        <input type="text" name="text" class="todo-input" placeholder="Add to your list..." />
+        <button class="add-btn" type="submit">
           <i class="fas fa-plus-circle"></i>
         </button>
       </form>
     </section>
-    <section class="content-list">
-      <ul id="list"></ul>
+    <section class="items-sec">
+      <ul class="todo-items">
+        <!-- dummy item -->
+        <li class="item" data-key="1594003133171">
+          <input class="checkbox" type="checkbox">
+          <a>Go to Gym</a>
+          <button class="delete-button"><i class="fas fa-trash"></i></button>
+        </li>
+      </ul>
     </section>
     <button type="submit" class="clear-completed">Clear All Completed</button>
   </div>
