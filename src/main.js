@@ -1,7 +1,8 @@
-/* eslint-disable max-len */
-const todoItemsList = document.querySelector('.todo-items');
+/* eslint-disable eqeqeq */
+/* eslint-disable import/no-cycle */
+import { todoItemsList, todos, addToLocalStorage } from './index.js';
 
-export default function renderTodos(todos) {
+export function renderTodos(todos) {
   // clear everything inside <ul> with class=todo-items
   todoItemsList.innerHTML = '';
   todos.forEach((item) => {
@@ -18,7 +19,6 @@ export default function renderTodos(todos) {
           <span>Go to Gym </span>
           <button class="delete-button">X</button>
         </li> */
-    // if item is completed, then add a class to <li> called 'checked', which will add line-through style
     if (item.completed === true) {
       li.classList.add('checked');
     }
@@ -30,4 +30,16 @@ export default function renderTodos(todos) {
     `;
     todoItemsList.append(li);
   });
+}
+
+// toggle the value to completed and not completed
+export function toggle(id) {
+  todos.forEach((item) => {
+    // use == not ===, because here types are different. One is number and other is string
+    if (item.id == id) {
+      // toggle the value
+      item.completed = !item.completed;
+    }
+  });
+  addToLocalStorage(todos);
 }
