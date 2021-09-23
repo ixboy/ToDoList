@@ -7,11 +7,10 @@ import '@fortawesome/fontawesome-free/js/solid';
 import '@fortawesome/fontawesome-free/js/regular';
 import '@fortawesome/fontawesome-free/js/brands';
 import './style.scss';
-import './main.js';
+import renderTodos from './main';
 
 const todoForm = document.querySelector('.todo-form');
 const todoInput = document.querySelector('.todo-input');
-const todoItemsList = document.querySelector('.todo-items');
 
 const todos = [];
 
