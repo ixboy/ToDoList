@@ -20,16 +20,13 @@ body {
 
 button:hover {
   cursor: pointer;
-  background-color: #73E831;
+  background-color: #73e831;
 }
 
 ul {
-  list-style-type: none; /* get rid of bullet points on side of list items */
+  list-style-type: none;
 }
 
-/* common style ends */
-
-/* container */
 .container {
   min-width: 700px;
   display: flex;
@@ -43,7 +40,6 @@ h1 {
   font-size: 3rem;
 }
 
-/* todo-form */
 
 .todo-form {
   margin: 40px 0px;
@@ -69,9 +65,6 @@ h1 {
   font-size: 1.2rem;
 }
 
-/* todo-form style ends */
-
-/* todo-items */
 .todo-items {
   min-width: 350px;
 }
@@ -111,11 +104,6 @@ h1 {
   font-weight: 550;
 }
 
-/* applied when the todo item is checked */
 .checked { 
   text-decoration: line-through;
 }
-
-/* todo-items style ends */
-
-/* container style ends */
