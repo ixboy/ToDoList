@@ -1,32 +1,76 @@
-import './style.scss';
+/* eslint-disable eqeqeq */
+/* eslint-disable import/no-mutable-exports */
+/* eslint-disable import/no-cycle */
 /* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable no-unused-vars */
-const list = document.querySelector('#list');
-const toDoList = [
-  {
-    description: 'Eat breakfast today',
-    completed: false,
-    index: 0,
-  },
-  {
-    description: 'watch video tutorials',
-    completed: false,
-    index: 1,
-  },
-  {
-    description: 'attend microverse classes',
-    completed: false,
-    index: 2,
-  },
-];
+/* eslint-disable import/no-unresolved */
 
-function addItems() {
-  list.innerHTML = '';
-  toDoList.forEach((e) => {
-    list.innerHTML += `<li>
-    <a class="text"> ${e.description} </a>
-    <i class="de fa fa-trash"></i>
-  </li>`;
-  });
+import '@fortawesome/fontawesome-free/js/fontawesome.js';
+import '@fortawesome/fontawesome-free/js/solid.js';
+import '@fortawesome/fontawesome-free/js/regular.js';
+import '@fortawesome/fontawesome-free/js/brands.js';
+import './style.scss';
+import { renderTodos, toggle } from './main.js';
+
+const todoForm = document.querySelector('.todo-form');
+const todoInput = document.querySelector('.todo-input');
+const todoItemsList = document.querySelector('.todo-items');
+
+let todos = [];
+
+if (localStorage.todos !== undefined) {
+  todos = JSON.parse(localStorage.todos);
 }
-window.addEventListener('DOMContentLoaded', addItems());
+
+function addToLocalStorage(todos) {
+  // conver the array to string then store it.
+  localStorage.setItem('todos', JSON.stringify(todos));
+  // render them to screen
+  renderTodos(todos);
+}
+
+export { todos, todoItemsList, addToLocalStorage };
+renderTodos(todos);
+
+function addTodo(item) {
+  // if item is not empty
+  if (item !== '') {
+    const todo = {
+      id: Date.now(),
+      description: item,
+      completed: false,
+      index: todos.length + 1,
+    };
+
+    todos.push(todo);
+    addToLocalStorage(todos);
+    todoInput.value = '';
+  }
+}
+
+// deletes a todo from todos array, then updates localstorage and renders updated list to screen
+function deleteTodo(id) {
+  // filters out the <li> with the id and updates the todos array
+  // console.log(id)
+  todos = todos.filter((item) => item.id != id);
+
+  // update the localStorage
+  addToLocalStorage(todos);
+}
+
+todoForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  addTodo(todoInput.value);
+});
+
+todoItemsList.addEventListener('click', (event) => {
+  // check if the event is on checkbox
+  if (event.target.type === 'checkbox') {
+    // toggle the state
+    toggle(event.target.parentElement.getAttribute('data-key'));
+  }
+  // check if that is a delete-button
+  if (event.target.classList.contains('delete-button')) {
+    // get id from data-key attribute's value of parent <li> where the delete-button is present
+    deleteTodo(event.target.parentElement.getAttribute('data-key'));
+  }
+});
