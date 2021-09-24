@@ -2,14 +2,14 @@
 /* eslint-disable import/no-mutable-exports */
 /* eslint-disable import/no-cycle */
 /* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable import/extensions */
+/* eslint-disable import/no-unresolved */
 
-import '@fortawesome/fontawesome-free/js/fontawesome';
-import '@fortawesome/fontawesome-free/js/solid';
-import '@fortawesome/fontawesome-free/js/regular';
-import '@fortawesome/fontawesome-free/js/brands';
+import '@fortawesome/fontawesome-free/js/fontawesome.js';
+import '@fortawesome/fontawesome-free/js/solid.js';
+import '@fortawesome/fontawesome-free/js/regular.js';
+import '@fortawesome/fontawesome-free/js/brands.js';
 import './style.scss';
-import { renderTodos, toggle } from './main';
+import { renderTodos, toggle } from './main.js';
 
 const todoForm = document.querySelector('.todo-form');
 const todoInput = document.querySelector('.todo-input');
