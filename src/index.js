@@ -9,7 +9,7 @@ import '@fortawesome/fontawesome-free/js/solid.js';
 import '@fortawesome/fontawesome-free/js/regular.js';
 import '@fortawesome/fontawesome-free/js/brands.js';
 import './style.scss';
-import App from './main';
+import App from './main.js';
 
 const todoForm = document.querySelector('.todo-form');
 const todoInput = document.querySelector('.todo-input');
@@ -22,21 +22,23 @@ if (localStorage.todos !== undefined) {
   todos = JSON.parse(localStorage.todos);
 }
 
-function updateIndex(todos){
-  let count = 1
-  todos.forEach(elem => {
-    elem.index = count
-    count++
+function updateIndex(todos) {
+  let count = 1;
+  todos.forEach((elem) => {
+    elem.index = count;
+    count += 1;
   });
 }
 
 function updateLocalStorage(todos) {
-  updateIndex(todos)
+  updateIndex(todos);
   localStorage.setItem('todos', JSON.stringify(todos));
   App.renderTodos(todos);
 }
 
-export { todos, todoItemsList, todoInput, updateLocalStorage };
+export {
+  todos, todoItemsList, todoInput, updateLocalStorage,
+};
 App.renderTodos(todos);
 
 todoForm.addEventListener('submit', (e) => {
@@ -59,10 +61,8 @@ todoItemsList.addEventListener('click', (event) => {
 
 todoItemsList.addEventListener('keyup', (e) => {
   if (e.target.classList.contains('input-desc') && (e.key === 'Enter')) {
-    console.log(e.target.value)
-    console.log(e.target.parentElement.getAttribute('data-key'))
     App.updateItem(e.target.value, e.target.parentElement.getAttribute('data-key'));
   }
 });
 
-clearAll.addEventListener('click', App.deleteAll)
+clearAll.addEventListener('click', App.deleteAll);
