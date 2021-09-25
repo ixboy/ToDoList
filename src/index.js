@@ -48,18 +48,6 @@ function addTodo(item) {
   }
 }
 
-function deleteTodo(id) {
-  // filters out the <li> with the id and updates the todos array
-  // console.log(id)
-  todos = todos.filter((item) => item.id != id);
-  updateLocalStorage(todos);
-}
-
-
-
-const listAll = document.querySelectorAll('.item');
-
-
 todoForm.addEventListener('submit', (e) => {
   e.preventDefault();
   addTodo(todoInput.value);
@@ -74,7 +62,7 @@ todoItemsList.addEventListener('click', (event) => {
   // check if that is a delete-button
   if (event.target.classList.contains('delete-button')) {
     // get id from data-key attribute's value of parent <li> where the delete-button is present
-    deleteTodo(event.target.parentElement.getAttribute('data-key'));
+    App.deleteTodo(event.target.parentElement.getAttribute('data-key'));
   }
 });
 
@@ -85,3 +73,5 @@ todoItemsList.addEventListener('keyup', (e) => {
     App.updateItem(e.target.value, e.target.parentElement.getAttribute('data-key'));
   }
 });
+
+clearAll.addEventListener('click', App.deleteAll)
