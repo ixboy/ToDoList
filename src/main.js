@@ -47,6 +47,23 @@ class App {
     })
     updateLocalStorage(todos);
   }
+
+  static deleteTodo(id) {
+    let ind = todos.findIndex(obj => obj.id == id);
+    todos.splice(ind, 1);
+    updateLocalStorage(todos);
+  }
+
+  static deleteAll() {
+    let toRemove = []
+    todos.forEach((item, index) => {
+      if (item.completed) toRemove.push(index)
+    });
+    
+    for (let i = toRemove.length -1; i >= 0; i--)
+      todos.splice(toRemove[i],1);
+    updateLocalStorage(todos);
+  }
   
 }
  
