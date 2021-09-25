@@ -9,11 +9,12 @@ import '@fortawesome/fontawesome-free/js/solid.js';
 import '@fortawesome/fontawesome-free/js/regular.js';
 import '@fortawesome/fontawesome-free/js/brands.js';
 import './style.scss';
-import { renderTodos, toggle } from './main.js';
+import App from './main.js';
 
 const todoForm = document.querySelector('.todo-form');
 const todoInput = document.querySelector('.todo-input');
 const todoItemsList = document.querySelector('.todo-items');
+const clearAll = document.querySelector('.clear-all');
 
 let todos = [];
 
@@ -21,56 +22,47 @@ if (localStorage.todos !== undefined) {
   todos = JSON.parse(localStorage.todos);
 }
 
-function addToLocalStorage(todos) {
-  // conver the array to string then store it.
+function updateIndex(todos) {
+  let count = 1;
+  todos.forEach((elem) => {
+    elem.index = count;
+    count += 1;
+  });
+}
+
+function updateLocalStorage(todos) {
+  updateIndex(todos);
   localStorage.setItem('todos', JSON.stringify(todos));
-  // render them to screen
-  renderTodos(todos);
+  App.renderTodos(todos);
 }
 
-export { todos, todoItemsList, addToLocalStorage };
-renderTodos(todos);
-
-function addTodo(item) {
-  // if item is not empty
-  if (item !== '') {
-    const todo = {
-      id: Date.now(),
-      description: item,
-      completed: false,
-      index: todos.length + 1,
-    };
-
-    todos.push(todo);
-    addToLocalStorage(todos);
-    todoInput.value = '';
-  }
-}
-
-// deletes a todo from todos array, then updates localstorage and renders updated list to screen
-function deleteTodo(id) {
-  // filters out the <li> with the id and updates the todos array
-  // console.log(id)
-  todos = todos.filter((item) => item.id != id);
-
-  // update the localStorage
-  addToLocalStorage(todos);
-}
+export {
+  todos, todoItemsList, todoInput, updateLocalStorage,
+};
+App.renderTodos(todos);
 
 todoForm.addEventListener('submit', (e) => {
   e.preventDefault();
-  addTodo(todoInput.value);
+  App.addTodo(todoInput.value);
 });
 
 todoItemsList.addEventListener('click', (event) => {
   // check if the event is on checkbox
   if (event.target.type === 'checkbox') {
     // toggle the state
-    toggle(event.target.parentElement.getAttribute('data-key'));
+    App.toggle(event.target.parentElement.getAttribute('data-key'));
   }
   // check if that is a delete-button
   if (event.target.classList.contains('delete-button')) {
     // get id from data-key attribute's value of parent <li> where the delete-button is present
-    deleteTodo(event.target.parentElement.getAttribute('data-key'));
+    App.deleteTodo(event.target.parentElement.getAttribute('data-key'));
   }
 });
+
+todoItemsList.addEventListener('keyup', (e) => {
+  if (e.target.classList.contains('input-desc') && (e.key === 'Enter')) {
+    App.updateItem(e.target.value, e.target.parentElement.getAttribute('data-key'));
+  }
+});
+
+clearAll.addEventListener('click', App.deleteAll);
