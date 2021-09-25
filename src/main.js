@@ -1,8 +1,24 @@
 /* eslint-disable eqeqeq */
 /* eslint-disable import/no-cycle */
-import { todoItemsList, todos, updateLocalStorage } from './index.js';
+import { todoItemsList, todos, todoInput, updateLocalStorage } from './index.js';
 
 class App { 
+
+  static addTodo(item) {
+    if (item !== '') {
+      const todo = {
+        id: Date.now(),
+        description: item,
+        completed: false,
+        index: todos.length + 1,
+      };
+  
+      todos.push(todo);
+      updateLocalStorage(todos);
+      todoInput.value = '';
+    }
+  }
+  
   static renderTodos(todos) {
     todoItemsList.innerHTML = '';
     todos.forEach((item) => {

@@ -22,35 +22,26 @@ if (localStorage.todos !== undefined) {
   todos = JSON.parse(localStorage.todos);
 }
 
+function updateIndex(todos){
+  let count = 1
+  todos.forEach(elem => {
+    elem.index = count
+    count++
+  });
+}
+
 function updateLocalStorage(todos) {
-  // conver the array to string then store it.
+  updateIndex(todos)
   localStorage.setItem('todos', JSON.stringify(todos));
-  // render them to screen
   App.renderTodos(todos);
 }
 
-export { todos, todoItemsList, updateLocalStorage };
+export { todos, todoItemsList, todoInput, updateLocalStorage };
 App.renderTodos(todos);
-
-function addTodo(item) {
-  // if item is not empty
-  if (item !== '') {
-    const todo = {
-      id: Date.now(),
-      description: item,
-      completed: false,
-      index: todos.length + 1,
-    };
-
-    todos.push(todo);
-    updateLocalStorage(todos);
-    todoInput.value = '';
-  }
-}
 
 todoForm.addEventListener('submit', (e) => {
   e.preventDefault();
-  addTodo(todoInput.value);
+  App.addTodo(todoInput.value);
 });
 
 todoItemsList.addEventListener('click', (event) => {
