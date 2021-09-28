@@ -24,6 +24,8 @@
     <img alt="Screenshot" src="./src/imgs/screenshot.png" width="500">
 </p>
 
+[Live Demo Link](https://ixboy.github.io/ToDoList/)
+
 
 ## Built With
 
