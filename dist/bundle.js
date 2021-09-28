@@ -4530,7 +4530,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "todos": () => (/* binding */ todos),
 /* harmony export */   "todoItemsList": () => (/* binding */ todoItemsList),
-/* harmony export */   "addToLocalStorage": () => (/* binding */ addToLocalStorage)
+/* harmony export */   "todoInput": () => (/* binding */ todoInput),
+/* harmony export */   "updateLocalStorage": () => (/* binding */ updateLocalStorage)
 /* harmony export */ });
 /* harmony import */ var _fortawesome_fontawesome_free_js_fontawesome_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @fortawesome/fontawesome-free/js/fontawesome.js */ "./node_modules/@fortawesome/fontawesome-free/js/fontawesome.js");
 /* harmony import */ var _fortawesome_fontawesome_free_js_fontawesome_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_fortawesome_fontawesome_free_js_fontawesome_js__WEBPACK_IMPORTED_MODULE_0__);
@@ -4560,65 +4561,52 @@ __webpack_require__.r(__webpack_exports__);
 var todoForm = document.querySelector('.todo-form');
 var todoInput = document.querySelector('.todo-input');
 var todoItemsList = document.querySelector('.todo-items');
+var clearAll = document.querySelector('.clear-all');
 var todos = [];
 
 if (localStorage.todos !== undefined) {
   todos = JSON.parse(localStorage.todos);
 }
 
-function addToLocalStorage(todos) {
-  // conver the array to string then store it.
-  localStorage.setItem('todos', JSON.stringify(todos)); // render them to screen
+function updateIndex(todos) {
+  var count = 1;
+  todos.forEach(function (elem) {
+    elem.index = count;
+    count += 1;
+  });
+}
 
-  (0,_main_js__WEBPACK_IMPORTED_MODULE_5__.renderTodos)(todos);
+function updateLocalStorage(todos) {
+  updateIndex(todos);
+  localStorage.setItem('todos', JSON.stringify(todos));
+  _main_js__WEBPACK_IMPORTED_MODULE_5__["default"].renderTodos(todos);
 }
 
 
-(0,_main_js__WEBPACK_IMPORTED_MODULE_5__.renderTodos)(todos);
-
-function addTodo(item) {
-  // if item is not empty
-  if (item !== '') {
-    var todo = {
-      id: Date.now(),
-      description: item,
-      completed: false,
-      index: todos.length + 1
-    };
-    todos.push(todo);
-    addToLocalStorage(todos);
-    todoInput.value = '';
-  }
-} // deletes a todo from todos array, then updates localstorage and renders updated list to screen
-
-
-function deleteTodo(id) {
-  // filters out the <li> with the id and updates the todos array
-  // console.log(id)
-  todos = todos.filter(function (item) {
-    return item.id != id;
-  }); // update the localStorage
-
-  addToLocalStorage(todos);
-}
-
+_main_js__WEBPACK_IMPORTED_MODULE_5__["default"].renderTodos(todos);
 todoForm.addEventListener('submit', function (e) {
   e.preventDefault();
-  addTodo(todoInput.value);
+  _main_js__WEBPACK_IMPORTED_MODULE_5__["default"].addTodo(todoInput.value);
 });
 todoItemsList.addEventListener('click', function (event) {
   // check if the event is on checkbox
   if (event.target.type === 'checkbox') {
     // toggle the state
-    (0,_main_js__WEBPACK_IMPORTED_MODULE_5__.toggle)(event.target.parentElement.getAttribute('data-key'));
+    _main_js__WEBPACK_IMPORTED_MODULE_5__["default"].toggle(event.target.parentElement.getAttribute('data-key'));
   } // check if that is a delete-button
 
 
   if (event.target.classList.contains('delete-button')) {
     // get id from data-key attribute's value of parent <li> where the delete-button is present
-    deleteTodo(event.target.parentElement.getAttribute('data-key'));
+    _main_js__WEBPACK_IMPORTED_MODULE_5__["default"].deleteTodo(event.target.parentElement.getAttribute('data-key'));
   }
 });
+todoItemsList.addEventListener('keyup', function (e) {
+  if (e.target.classList.contains('input-desc') && e.key === 'Enter') {
+    _main_js__WEBPACK_IMPORTED_MODULE_5__["default"].updateItem(e.target.value, e.target.parentElement.getAttribute('data-key'));
+  }
+});
+clearAll.addEventListener('click', _main_js__WEBPACK_IMPORTED_MODULE_5__["default"].deleteAll);
 
 /***/ }),
 
@@ -4631,50 +4619,106 @@ todoItemsList.addEventListener('click', function (event) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "renderTodos": () => (/* binding */ renderTodos),
-/* harmony export */   "toggle": () => (/* binding */ toggle)
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index.js */ "./src/index.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 /* eslint-disable eqeqeq */
 
 /* eslint-disable import/no-cycle */
 
-function renderTodos(todos) {
-  // clear everything inside <ul> with class=todo-items
-  _index_js__WEBPACK_IMPORTED_MODULE_0__.todoItemsList.innerHTML = '';
-  todos.forEach(function (item) {
-    // check if the item is completed
-    var checked = item.completed ? 'checked' : null;
-    var li = document.createElement('li'); // <li class="item"> </li>
 
-    li.setAttribute('class', 'item'); // <li class="item" data-key="20200708"> </li>
+var App = /*#__PURE__*/function () {
+  function App() {
+    _classCallCheck(this, App);
+  }
 
-    li.setAttribute('data-key', item.id);
-    /* <li class="item" data-key="20200708">
-          <input type="checkbox" class="checkbox">
-          <span>Go to Gym </span>
-          <button class="delete-button">X</button>
-        </li> */
-
-    if (item.completed === true) {
-      li.classList.add('checked');
+  _createClass(App, null, [{
+    key: "addTodo",
+    value: function addTodo(item) {
+      if (item !== '') {
+        var todo = {
+          id: Date.now(),
+          description: item,
+          completed: false,
+          index: _index_js__WEBPACK_IMPORTED_MODULE_0__.todos.length + 1
+        };
+        _index_js__WEBPACK_IMPORTED_MODULE_0__.todos.push(todo);
+        (0,_index_js__WEBPACK_IMPORTED_MODULE_0__.updateLocalStorage)(_index_js__WEBPACK_IMPORTED_MODULE_0__.todos);
+        _index_js__WEBPACK_IMPORTED_MODULE_0__.todoInput.value = '';
+      }
     }
+  }, {
+    key: "renderTodos",
+    value: function renderTodos(todos) {
+      _index_js__WEBPACK_IMPORTED_MODULE_0__.todoItemsList.innerHTML = '';
+      todos.forEach(function (item) {
+        // check if the item is completed
+        var checked = item.completed ? 'checked' : null;
+        var li = document.createElement('li');
+        li.setAttribute('class', 'item'); // <li class="item" data-key="20200708"> </li>
 
-    li.innerHTML = "\n      <input type=\"checkbox\" class=\"checkbox\" ".concat(checked, ">\n      <span>").concat(item.description, "</span>\n      <button class=\"delete-button\">X</button>\n    ");
-    _index_js__WEBPACK_IMPORTED_MODULE_0__.todoItemsList.append(li);
-  });
-} // toggle the value to completed and not completed
+        li.setAttribute('data-key', item.id);
 
-function toggle(id) {
-  _index_js__WEBPACK_IMPORTED_MODULE_0__.todos.forEach(function (item) {
-    // use == not ===, because here types are different. One is number and other is string
-    if (item.id == id) {
-      // toggle the value
-      item.completed = !item.completed;
+        if (item.completed === true) {
+          li.classList.add('checked');
+        }
+
+        li.innerHTML = "\n        <input type=\"checkbox\" class=\"checkbox\" ".concat(checked, ">\n        <input type=\"text\" value=\"").concat(item.description, "\" class=\"input-desc ").concat(checked, "\">\n        <button class=\"delete-button\">X</button>\n      ");
+        _index_js__WEBPACK_IMPORTED_MODULE_0__.todoItemsList.append(li);
+      });
     }
-  });
-  (0,_index_js__WEBPACK_IMPORTED_MODULE_0__.addToLocalStorage)(_index_js__WEBPACK_IMPORTED_MODULE_0__.todos);
-}
+  }, {
+    key: "toggle",
+    value: function toggle(id) {
+      _index_js__WEBPACK_IMPORTED_MODULE_0__.todos.forEach(function (item) {
+        // use == not ===, because here types are different. One is number and other is string
+        if (item.id == id) item.completed = !item.completed; // toggle the value
+      });
+      (0,_index_js__WEBPACK_IMPORTED_MODULE_0__.updateLocalStorage)(_index_js__WEBPACK_IMPORTED_MODULE_0__.todos);
+    }
+  }, {
+    key: "updateItem",
+    value: function updateItem(newValue, id) {
+      _index_js__WEBPACK_IMPORTED_MODULE_0__.todos.forEach(function (list) {
+        if (list.id == id) list.description = newValue;
+      });
+      (0,_index_js__WEBPACK_IMPORTED_MODULE_0__.updateLocalStorage)(_index_js__WEBPACK_IMPORTED_MODULE_0__.todos);
+    }
+  }, {
+    key: "deleteTodo",
+    value: function deleteTodo(id) {
+      var ind = _index_js__WEBPACK_IMPORTED_MODULE_0__.todos.findIndex(function (obj) {
+        return obj.id == id;
+      });
+      _index_js__WEBPACK_IMPORTED_MODULE_0__.todos.splice(ind, 1);
+      (0,_index_js__WEBPACK_IMPORTED_MODULE_0__.updateLocalStorage)(_index_js__WEBPACK_IMPORTED_MODULE_0__.todos);
+    }
+  }, {
+    key: "deleteAll",
+    value: function deleteAll() {
+      var toRemove = [];
+      _index_js__WEBPACK_IMPORTED_MODULE_0__.todos.forEach(function (item, index) {
+        if (item.completed) toRemove.push(index);
+      });
+
+      for (var i = toRemove.length - 1; i >= 0; i -= 1) {
+        _index_js__WEBPACK_IMPORTED_MODULE_0__.todos.splice(toRemove[i], 1);
+      }
+
+      (0,_index_js__WEBPACK_IMPORTED_MODULE_0__.updateLocalStorage)(_index_js__WEBPACK_IMPORTED_MODULE_0__.todos);
+    }
+  }]);
+
+  return App;
+}();
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (App);
 
 /***/ }),
 
@@ -4699,7 +4743,7 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 ___CSS_LOADER_EXPORT___.push([module.id, "@import url(https://fonts.googleapis.com/css?family=Karla:weight@400;700&display=swap);"]);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "* {\n  padding: 0;\n  margin: 0; }\n\nbody {\n  font-family: \"Karla\", sans-serif;\n  color: #3e6f9e;\n  min-height: 100vh;\n  display: flex;\n  justify-content: center;\n  background: linear-gradient(#f00000b0, #dc441e); }\n\nbutton:hover {\n  cursor: pointer;\n  background-color: #490000;\n  color: #ec0909; }\n\nul {\n  list-style-type: none; }\n\n.container {\n  min-width: 700px;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  padding: 20px; }\n\nh1 {\n  color: #fff;\n  font-size: 3rem; }\n\n.todo-form {\n  margin: 40px 0; }\n\n.todo-input {\n  width: 250px;\n  border: none;\n  outline: none;\n  border-radius: 5px;\n  padding: 10px;\n  margin-right: 10px;\n  font-size: 1rem; }\n\n.add-button,\n.clear-all {\n  background-color: #33339e;\n  color: #fff;\n  border: none;\n  outline: none;\n  border-radius: 5px;\n  padding: 7px;\n  margin-top: 5px;\n  font-size: 1.2rem; }\n\n.todo-items {\n  min-width: 350px;\n  /* each li with class=\"item\" */\n  /* item style end */ }\n  .todo-items .item {\n    background-color: #fff;\n    padding: 10px;\n    font-size: 1.1rem;\n    border-radius: 7px;\n    border: 2px solid #ccc; }\n  .todo-items .checkbox {\n    margin-right: 10px; }\n  .todo-items .delete-button {\n    float: right;\n    background-color: #dc143c;\n    border: none;\n    outline: none;\n    border-radius: 7px;\n    padding: 2px 5px;\n    font-size: 1.1rem;\n    font-weight: 550; }\n  .todo-items .delete-button:hover {\n    background-color: #490000;\n    color: #ec0909; }\n  .todo-items .checked {\n    text-decoration: line-through; }\n", "",{"version":3,"sources":["webpack://./src/style.scss"],"names":[],"mappings":"AAKA;EACE,UAAU;EACV,SAAS,EAAA;;AAGX;EACE,gCATwB;EAUxB,cATqB;EAUrB,iBAAiB;EACjB,aAAa;EACb,uBAAuB;EACvB,+CAA+C,EAAA;;AAGjD;EACE,eAAe;EACf,yBAAyB;EACzB,cAAqB,EAAA;;AAGvB;EACE,qBAAqB,EAAA;;AAGvB;EACE,gBAAgB;EAChB,aAAa;EACb,sBAAsB;EACtB,mBAAmB;EACnB,aAAa,EAAA;;AAGf;EACE,WAAW;EACX,eAAe,EAAA;;AAGjB;EACE,cAAc,EAAA;;AAGhB;EACE,YAAY;EACZ,YAAY;EACZ,aAAa;EACb,kBAAkB;EAClB,aAAa;EACb,kBAAkB;EAClB,eAAe,EAAA;;AAGjB;;EAEE,yBAAkC;EAClC,WAAW;EACX,YAAY;EACZ,aAAa;EACb,kBAAkB;EAClB,YAAY;EACZ,eAAe;EACf,iBAAiB,EAAA;;AAGnB;EACE,gBAAgB;EAEhB,8BAAA;EASA,mBAAA,EAAoB;EAZtB;IAKI,sBAAsB;IACtB,aAAa;IACb,iBAAiB;IACjB,kBAAkB;IAClB,sBAAsB,EAAA;EAT1B;IAeI,kBAAkB,EAAA;EAftB;IAmBI,YAAY;IACZ,yBAAyB;IACzB,YAAY;IACZ,aAAa;IACb,kBAAkB;IAClB,gBAAgB;IAChB,iBAAiB;IACjB,gBAAgB,EAAA;EA1BpB;IA8BI,yBAAyB;IACzB,cAAqB,EAAA;EA/BzB;IAmCI,6BAA6B,EAAA","sourcesContent":["@import url(\"https://fonts.googleapis.com/css?family=Karla:weight@400;700&display=swap\");\n\n$font: \"Karla\", sans-serif;\n$primary-color: #3e6f9e;\n\n* {\n  padding: 0;\n  margin: 0;\n}\n\nbody {\n  font-family: $font;\n  color: $primary-color;\n  min-height: 100vh;\n  display: flex;\n  justify-content: center;\n  background: linear-gradient(#f00000b0, #dc441e);\n}\n\nbutton:hover {\n  cursor: pointer;\n  background-color: #490000;\n  color: rgb(236, 9, 9);\n}\n\nul {\n  list-style-type: none;\n}\n\n.container {\n  min-width: 700px;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  padding: 20px;\n}\n\nh1 {\n  color: #fff;\n  font-size: 3rem;\n}\n\n.todo-form {\n  margin: 40px 0;\n}\n\n.todo-input {\n  width: 250px;\n  border: none;\n  outline: none;\n  border-radius: 5px;\n  padding: 10px;\n  margin-right: 10px;\n  font-size: 1rem;\n}\n\n.add-button,\n.clear-all {\n  background-color: rgb(51, 51, 158);\n  color: #fff;\n  border: none;\n  outline: none;\n  border-radius: 5px;\n  padding: 7px;\n  margin-top: 5px;\n  font-size: 1.2rem;\n}\n\n.todo-items {\n  min-width: 350px;\n\n  /* each li with class=\"item\" */\n  .item {\n    background-color: #fff;\n    padding: 10px;\n    font-size: 1.1rem;\n    border-radius: 7px;\n    border: 2px solid #ccc;\n  }\n\n  /* item style end */\n\n  .checkbox {\n    margin-right: 10px;\n  }\n\n  .delete-button {\n    float: right;\n    background-color: #dc143c;\n    border: none;\n    outline: none;\n    border-radius: 7px;\n    padding: 2px 5px;\n    font-size: 1.1rem;\n    font-weight: 550;\n  }\n\n  .delete-button:hover {\n    background-color: #490000;\n    color: rgb(236, 9, 9);\n  }\n\n  .checked {\n    text-decoration: line-through;\n  }\n}\n"],"sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, "* {\n  padding: 0;\n  margin: 0; }\n\nbody {\n  font-family: \"Karla\", sans-serif;\n  color: #3e6f9e;\n  min-height: 100vh;\n  display: flex;\n  justify-content: center;\n  background: linear-gradient(#f00000b0, #dc441e); }\n\nbutton:hover {\n  cursor: pointer;\n  background-color: #490000;\n  color: #ec0909; }\n\nul {\n  list-style-type: none; }\n\n.container {\n  min-width: 700px;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  padding: 20px; }\n\nh1 {\n  color: #fff;\n  font-size: 3rem; }\n\n.todo-form {\n  margin: 40px 0; }\n\n.todo-input {\n  width: 250px;\n  border: none;\n  outline: none;\n  border-radius: 5px;\n  padding: 10px;\n  margin-right: 10px;\n  font-size: 1rem; }\n\n.add-button,\n.clear-all {\n  background-color: #33339e;\n  color: #fff;\n  border: none;\n  outline: none;\n  border-radius: 5px;\n  padding: 7px;\n  margin-top: 5px;\n  font-size: 1.2rem; }\n\n.todo-items {\n  min-width: 350px;\n  /* each li with class=\"item\" */ }\n  .todo-items .item {\n    background-color: #fff;\n    padding: 10px;\n    font-size: 1.1rem;\n    border-radius: 7px;\n    border: 2px solid #ccc; }\n  .todo-items .input-desc {\n    border: none; }\n  .todo-items .checkbox {\n    margin-right: 10px; }\n  .todo-items .delete-button {\n    float: right;\n    background-color: #dc143c;\n    border: none;\n    outline: none;\n    border-radius: 7px;\n    padding: 2px 5px;\n    font-size: 1.1rem;\n    font-weight: 550; }\n  .todo-items .delete-button:hover {\n    background-color: #490000;\n    color: #ec0909; }\n  .todo-items .checked {\n    text-decoration: line-through; }\n", "",{"version":3,"sources":["webpack://./src/style.scss"],"names":[],"mappings":"AAKA;EACE,UAAU;EACV,SAAS,EAAA;;AAGX;EACE,gCATwB;EAUxB,cATqB;EAUrB,iBAAiB;EACjB,aAAa;EACb,uBAAuB;EACvB,+CAA+C,EAAA;;AAGjD;EACE,eAAe;EACf,yBAAyB;EACzB,cAAqB,EAAA;;AAGvB;EACE,qBAAqB,EAAA;;AAGvB;EACE,gBAAgB;EAChB,aAAa;EACb,sBAAsB;EACtB,mBAAmB;EACnB,aAAa,EAAA;;AAGf;EACE,WAAW;EACX,eAAe,EAAA;;AAGjB;EACE,cAAc,EAAA;;AAGhB;EACE,YAAY;EACZ,YAAY;EACZ,aAAa;EACb,kBAAkB;EAClB,aAAa;EACb,kBAAkB;EAClB,eAAe,EAAA;;AAGjB;;EAEE,yBAAkC;EAClC,WAAW;EACX,YAAY;EACZ,aAAa;EACb,kBAAkB;EAClB,YAAY;EACZ,eAAe;EACf,iBAAiB,EAAA;;AAGnB;EACE,gBAAgB;EAEhB,8BAAA,EAA+B;EAHjC;IAKI,sBAAsB;IACtB,aAAa;IACb,iBAAiB;IACjB,kBAAkB;IAClB,sBAAsB,EAAA;EAT1B;IAaI,YAAY,EAAA;EAbhB;IAiBI,kBAAkB,EAAA;EAjBtB;IAqBI,YAAY;IACZ,yBAAyB;IACzB,YAAY;IACZ,aAAa;IACb,kBAAkB;IAClB,gBAAgB;IAChB,iBAAiB;IACjB,gBAAgB,EAAA;EA5BpB;IAgCI,yBAAyB;IACzB,cAAqB,EAAA;EAjCzB;IAqCI,6BAA6B,EAAA","sourcesContent":["@import url(\"https://fonts.googleapis.com/css?family=Karla:weight@400;700&display=swap\");\n\n$font: \"Karla\", sans-serif;\n$primary-color: #3e6f9e;\n\n* {\n  padding: 0;\n  margin: 0;\n}\n\nbody {\n  font-family: $font;\n  color: $primary-color;\n  min-height: 100vh;\n  display: flex;\n  justify-content: center;\n  background: linear-gradient(#f00000b0, #dc441e);\n}\n\nbutton:hover {\n  cursor: pointer;\n  background-color: #490000;\n  color: rgb(236, 9, 9);\n}\n\nul {\n  list-style-type: none;\n}\n\n.container {\n  min-width: 700px;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  padding: 20px;\n}\n\nh1 {\n  color: #fff;\n  font-size: 3rem;\n}\n\n.todo-form {\n  margin: 40px 0;\n}\n\n.todo-input {\n  width: 250px;\n  border: none;\n  outline: none;\n  border-radius: 5px;\n  padding: 10px;\n  margin-right: 10px;\n  font-size: 1rem;\n}\n\n.add-button,\n.clear-all {\n  background-color: rgb(51, 51, 158);\n  color: #fff;\n  border: none;\n  outline: none;\n  border-radius: 5px;\n  padding: 7px;\n  margin-top: 5px;\n  font-size: 1.2rem;\n}\n\n.todo-items {\n  min-width: 350px;\n\n  /* each li with class=\"item\" */\n  .item {\n    background-color: #fff;\n    padding: 10px;\n    font-size: 1.1rem;\n    border-radius: 7px;\n    border: 2px solid #ccc;\n  }\n\n  .input-desc {\n    border: none;\n  }\n\n  .checkbox {\n    margin-right: 10px;\n  }\n\n  .delete-button {\n    float: right;\n    background-color: #dc143c;\n    border: none;\n    outline: none;\n    border-radius: 7px;\n    padding: 2px 5px;\n    font-size: 1.1rem;\n    font-weight: 550;\n  }\n\n  .delete-button:hover {\n    background-color: #490000;\n    color: rgb(236, 9, 9);\n  }\n\n  .checked {\n    text-decoration: line-through;\n  }\n}\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
